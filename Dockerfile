@@ -62,11 +62,15 @@ EXPOSE 8080 8000
 
 # Create a startup script to run both Nginx and Gunicorn simultaneously
 RUN echo '#!/bin/sh\n\
-    echo "Starting FastAPI Backend..."\n\
-    cd /app/backend\n\
-    gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 &\n\
+    # Dynamically inject Cloud Run PORT into Nginx config\n\
+    export PORT="${PORT:-8080}"\n\
+    sed -i "s/listen 8080;/listen ${PORT};/g" /etc/nginx/conf.d/webapp.conf\n\
     \n\
-    echo "Starting Nginx..."\n\
+    echo "Starting FastAPI Backend on internal port 8000..."\n\
+    cd /app/backend\n\
+    gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 127.0.0.1:8000 &\n\
+    \n\
+    echo "Starting Nginx on external port ${PORT}..."\n\
     nginx -g "daemon off;"\n\
     ' > /app/start.sh
 

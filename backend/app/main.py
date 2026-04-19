@@ -23,6 +23,18 @@ async def startup_event():
     else:
         masked_key = api_key[:4] + "***" + api_key[-4:] if len(api_key) > 8 else "***"
         logger.info(f"STARTUP SUCCESS: GOOGLE_API_KEY is correctly loaded into the container! Masked: {masked_key}")
+        
+        # Log all available models to verify regional support
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            logger.info("--- LISTING AVAILABLE MODELS FOR THIS API KEY ---")
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    logger.info(f"SUPPORTED MODEL: {m.name}")
+            logger.info("--------------------------------------------------")
+        except Exception as e:
+            logger.error(f"Failed to list models: {str(e)}")
     # -----------------------------------------------
 
 
