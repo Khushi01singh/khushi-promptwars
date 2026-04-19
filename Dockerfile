@@ -27,19 +27,22 @@ RUN apt-get update && \
 COPY --from=frontend-builder /app/frontend/dist /var/www/html
 
 # Configure Nginx to serve the React app and proxy API requests
-RUN echo 'server { \
+RUN rm -f /etc/nginx/sites-enabled/default && \
+    rm -f /etc/nginx/sites-available/default && \
+    echo 'server { \
     listen 8080; \
+    include /etc/nginx/mime.types; \
     location / { \
-    root /var/www/html; \
-    index index.html index.htm; \
-    try_files $uri $uri/ /index.html; \
+        root /var/www/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
     } \
     location /api/ { \
-    proxy_pass http://127.0.0.1:8000; \
-    proxy_set_header Host $host; \
-    proxy_set_header X-Real-IP $remote_addr; \
+        proxy_pass http://127.0.0.1:8000; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
     } \
-    }' > /etc/nginx/sites-available/default
+}' > /etc/nginx/conf.d/webapp.conf
 
 # Set up Backend directory
 WORKDIR /app/backend

@@ -90,7 +90,7 @@ function App() {
     formData.append('job_description', jobDescription);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/upload/process-resume', {
+      const response = await fetch('/api/v1/upload/process-resume', {
         method: 'POST',
         body: formData,
       });
