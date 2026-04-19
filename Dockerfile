@@ -11,6 +11,7 @@ RUN npm install
 
 # Copy the rest of the frontend source code and build
 COPY frontend/ ./
+RUN echo "Force clean build"
 RUN npm run build
 
 # ==========================================
