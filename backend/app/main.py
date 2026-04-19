@@ -21,8 +21,7 @@ async def startup_event():
     if not api_key:
         logger.error("STARTUP ERROR: GOOGLE_API_KEY is explicitly None or empty at application boot time!")
     else:
-        masked_key = api_key[:4] + "***" + api_key[-4:] if len(api_key) > 8 else "***"
-        logger.info(f"STARTUP SUCCESS: GOOGLE_API_KEY is correctly loaded into the container! Masked: {masked_key}")
+        logger.info("STARTUP SUCCESS: GOOGLE_API_KEY is correctly loaded into the container!")
         
         # Log all available models to verify regional support
         try:

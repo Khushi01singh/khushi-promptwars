@@ -61,23 +61,36 @@ class JobMatcher:
         """LangGraph Node to run the LLM evaluation."""
         logger.info("Starting candidate evaluation node.")
         
-        # --- DEBUGGING SNIPPET FOR CLOUD RUN ---
-        api_key = os.environ.get("GOOGLE_API_KEY")
-        if not api_key:
-            logger.error("DEBUG: GOOGLE_API_KEY environment variable is explicitly None or empty!")
+        # --- SECURELY FETCH API KEYS FROM ENVIRONMENT ---
+        # Absolutely no keys are printed or masked in logs
+        google_api_key = os.getenv("GOOGLE_API_KEY")
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        
+        if not google_api_key and not openai_api_key:
+            logger.error("DEBUG: Both GOOGLE_API_KEY and OPENAI_API_KEY are missing from the environment!")
         else:
-            # Mask the key for security in logs
-            masked_key = api_key[:4] + "***" + api_key[-4:] if len(api_key) > 8 else "***"
-            logger.info(f"DEBUG: GOOGLE_API_KEY is detected successfully! Masked value: {masked_key}")
-        # ----------------------------------------
+            logger.info("DEBUG: API Key securely detected from environment.")
+        # ------------------------------------------------
 
         try:
-            # Initialize the LLM explicitly passing the key to avoid Langchain autodetection bugs
-            llm = ChatGoogleGenerativeAI(
-                model=self.model_name, 
-                temperature=0.1,
-                google_api_key=api_key
-            )
+            # Dynamically initialize the correct LLM based on model name
+            if self.model_name.startswith("gpt-"):
+                from langchain_openai import ChatOpenAI
+                if not openai_api_key:
+                    raise ValueError("OPENAI_API_KEY is required for GPT models but was not found.")
+                llm = ChatOpenAI(
+                    model=self.model_name,
+                    temperature=0.1,
+                    openai_api_key=openai_api_key
+                )
+            else:
+                if not google_api_key:
+                    raise ValueError("GOOGLE_API_KEY is required for Gemini models but was not found.")
+                llm = ChatGoogleGenerativeAI(
+                    model=self.model_name, 
+                    temperature=0.1,
+                    google_api_key=google_api_key
+                )
             
             # Create the LangChain processing pipeline
             chain = self.prompt | llm | self.parser

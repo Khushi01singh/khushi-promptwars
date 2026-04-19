@@ -7,3 +7,4 @@ langchain
 langchain-core
 python-multipart
 langchain-google-genai
+langchain-openai
