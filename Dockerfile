@@ -28,7 +28,7 @@ COPY --from=frontend-builder /app/frontend/dist /var/www/html
 
 # Configure Nginx to serve the React app and proxy API requests
 RUN echo 'server { \
-    listen 80; \
+    listen 8080; \
     location / { \
     root /var/www/html; \
     index index.html index.htm; \
@@ -54,7 +54,7 @@ RUN pip install --no-cache-dir gunicorn uvicorn
 COPY backend/ .
 
 # Expose Nginx port and Backend port
-EXPOSE 80 8000
+EXPOSE 8080 8000
 
 # Create a startup script to run both Nginx and Gunicorn simultaneously
 RUN echo '#!/bin/sh\n\
