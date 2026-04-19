@@ -9,8 +9,9 @@
 }
 
 @layer utilities {
-  .floating-label-input:focus ~ label,
-  .floating-label-input:not(:placeholder-shown) ~ label {
+
+  .floating-label-input:focus~label,
+  .floating-label-input:not(:placeholder-shown)~label {
     @apply -translate-y-6 scale-75 text-primary-600;
   }
 }
