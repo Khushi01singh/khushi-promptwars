@@ -26,7 +26,7 @@ class JobMatchState(TypedDict):
     error: str
 
 class JobMatcher:
-    def __init__(self, model_name: str = "gemini-1.5-pro"):
+    def __init__(self, model_name: str = "gemini-1.5-flash"):
         """Initialize the JobMatcher with a specific LLM and prompts."""
         self.model_name = model_name
         self.parser = PydanticOutputParser(pydantic_object=MatchResult)
